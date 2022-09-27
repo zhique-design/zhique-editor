@@ -38,7 +38,7 @@ MarkdownEditor
   import 'codemirror/lib/codemirror.css';
   import 'codemirror/mode/gfm/gfm';
   import 'github-markdown-css/github-markdown.css';
-  ReactDom.render(<ZhiQueEditor />, document.getElementById('app'));
+  ReactDom.render(<MarkdownEditor />, document.getElementById('app'));
   ```
 2. **props**
 
