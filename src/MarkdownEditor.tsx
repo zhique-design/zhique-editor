@@ -4,19 +4,20 @@ import {  EditorConfiguration } from 'codemirror';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 
-import CodeBlock from '@/CodeBlock';
-import Markdown from '@/Markdown';
-
+import CodeBlock from './CodeBlock';
+import Markdown from './Markdown';
 
 import './index.less';
 
-interface MarkdownEditorProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MarkdownEditorProps {
   value?: string;
   width?: string | number;
   height?: string | number;
   fullScreen?: boolean;
   watch?: boolean;
   cmOptions?: EditorConfiguration;
+  className?: string;
+  onChange?: (value) => void;
 }
 
 type EditorUIProps = {
@@ -136,7 +137,7 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
       height: fullScreen ? window.innerHeight : height
     }
     return (
-      <div {...rest} className={cls} style={styles}>
+      <div className={cls} style={styles}>
         <CodeBlock
           value={this.text}
           options={cmOptions}
