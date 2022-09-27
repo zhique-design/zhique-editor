@@ -33,7 +33,7 @@ MarkdownEditor
   ```typescript jsx
   import React from 'react';
   import ReactDom from 'react-dom';
-  import { MarkdownEditor } from '@zhique-design/zhique-editor';
+  import { MarkdownEditor } from 'zhique-editor';
   import 'codemirror/lib/codemirror';
   import 'codemirror/lib/codemirror.css';
   import 'codemirror/mode/gfm/gfm';
