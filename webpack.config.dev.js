@@ -2,6 +2,8 @@ const path = require('path');
 const production = process.env.NODE_ENV === 'production';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const WebpackBar = require('webpackbar');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     mode: production ? 'production' : 'development',
@@ -59,7 +61,11 @@ module.exports = {
             },
           {
             test: /\.(css|less)$/,
-            use: ['style-loader', 'css-loader', 'less-loader']
+            use: [
+              MiniCssExtractPlugin.loader,
+              'css-loader',
+              'less-loader',
+            ]
           },
         ]
     },
@@ -71,5 +77,10 @@ module.exports = {
         new CleanWebpackPlugin({
             cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, 'demo', 'dist')]
         }),
+      new MiniCssExtractPlugin({
+        filename: 'static/css/[name].[hash:8].css',
+        chunkFilename: 'static/css/[name].chunk.[hash:8].css',
+      }),
+      new WebpackBar({ profile: true }),
     ],
 };

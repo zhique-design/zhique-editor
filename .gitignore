@@ -10,6 +10,7 @@
 
 # production
 /dist
+/demo/dist
 
 # misc
 .DS_Store
