@@ -9,4 +9,4 @@ import 'codemirror/mode/gfm/gfm';
 
 import 'github-markdown-css/github-markdown.css';
 
-ReactDom.render(<MarkdownEditor  cmOptions={{ mode: 'gfm' }} />, document.getElementById('root'));
+ReactDom.render(<MarkdownEditor value="这是一个demo" cmOptions={{ mode: 'gfm' }} />, document.getElementById('root'));
