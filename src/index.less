@@ -1,0 +1,32 @@
+@border-style: 1px solid #ddd;
+
+.zhique-editor {
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  border: @border-style;
+  margin: 0 auto;
+
+  ::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+  }
+
+  .CodeMirror {
+    flex: 1 1;
+    height: 100%;
+    line-height: 1.6;
+    border-right: @border-style;
+  }
+
+  &-preview {
+    overflow: auto;
+    line-height: 1.6;
+  }
+}
