@@ -54,8 +54,13 @@ module.exports = {
             {
                 enforce: "pre",
                 test: /\.js$/,
+                exclude: /node_modules/,
                 loader: "source-map-loader"
-            }
+            },
+          {
+            test: /\.(css|less)$/,
+            use: ['style-loader', 'css-loader', 'less-loader']
+          },
         ]
     },
     plugins: [
