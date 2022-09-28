@@ -1,0 +1,23 @@
+language: node_js
+
+node_js:
+  - node
+
+before_install:
+  - npm i -g yarn
+
+install:
+  - yarn
+
+script:
+  - yarn build
+  - yarn run build:demo
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  local_dir: ./demo/dist/
+  on:
+    branch: master
