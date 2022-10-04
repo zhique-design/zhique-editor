@@ -1,6 +1,8 @@
 zhique-editor
 ======================
 [![Build Status](https://app.travis-ci.com/zhique-design/zhique-editor.svg?branch=master)](https://app.travis-ci.com/zhique-design/zhique-editor)
+[![Build Status](https://github.com/zhique-design/zhique-editor/actions/workflows/gh-pages.yml/badge.svg?branch=master)](https://github.com/zhique-design/zhique-editor/actions/workflows/gh-pages.yml)
+
 
 **zhique-editor** : The open source online code editor (component), based on [react](https://reactjs.org/ "react") & [react-markdown](http://rexxars.github.io/react-markdown/ "react-markdown") & [codemirror](https://codemirror.net/ "codemirror").
 
