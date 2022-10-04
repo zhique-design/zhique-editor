@@ -8,7 +8,6 @@ zhique-editor
 - Support Standard Markdown / CommonMark and GFM (GitHub Flavored Markdown)
 - Real-time Preview, Code fold, Code syntax highlighting...
 - Synchronized scrolling
-- powerful toolbar for markdown editor
 
 ## Installing
 
