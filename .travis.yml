@@ -12,12 +12,3 @@ install:
 script:
   - yarn run build:ts
   - yarn run build:demo
-
-#deploy:
-#  provider: pages
-#  skip_cleanup: true
-#  github_token: $GITHUB_TOKEN
-#  keep_history: true
-#  local_dir: ./demo/dist/
-#  on:
-#    branch: master
