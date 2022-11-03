@@ -22,7 +22,8 @@
     "start:demo": "webpack-dev-server --config webpack.config.dev.js",
     "build:demo": "cross-env NODE_ENV=production webpack --mode production --config webpack.config.dev.js",
     "clean:dist": "rimraf ./dist",
-    "build:ts": "yarn run clean:dist && tsc -p tsconfig.production.json",
+    "copy:files": "copyfiles -u 1 src/**/*.less dist/",
+    "build:ts": "yarn run clean:dist && tsc -p tsconfig.production.json && yarn run copy:files",
     "deploy": "yarn run build:demo && gh-pages -d demo/dist"
   },
   "devDependencies": {
@@ -34,6 +35,7 @@
     "@types/react-dom": "^16.9.16",
     "babel-loader": "^8.2.5",
     "clean-webpack-plugin": "^4.0.0",
+    "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.1",
     "gh-pages": "^4.0.0",
