@@ -1,16 +1,26 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import {  EditorConfiguration } from 'codemirror';
+import CodeMirror, {  EditorConfiguration } from 'codemirror';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
-
+import moment from 'moment';
 import CodeBlock from './CodeBlock';
 import Markdown from './Markdown';
+import Icon from './Icon';
 
 import './assets/iconfont';
 
 import './index.less';
-import Icon from './Icon';
+
+interface menuItemConfig {
+  title: string;
+  icon?: string;
+  text?: string;
+  // @ts-ignore
+  onClick: (event: MouseEvent<HTMLLIElement, MouseEvent>) => void;
+}
+
+export type MenuListConfig = Array<menuItemConfig | '|'>;
 
 interface MarkdownEditorProps {
   value?: string;
@@ -21,6 +31,8 @@ interface MarkdownEditorProps {
   cmOptions?: EditorConfiguration;
   className?: string;
   onChange?: (value) => void;
+  menuList?: (cm?: CodeMirror) => MenuListConfig;
+  dateFormat?: string;
 }
 
 type EditorUIProps = {
@@ -28,6 +40,7 @@ type EditorUIProps = {
   height?: string | number;
   watch?: boolean;
   fullScreen?: boolean;
+  toolBarHeight?: number;
 }
 
 @observer
@@ -45,6 +58,7 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
 
   previewBlock: HTMLDivElement | null = null;
   codeBlock: CodeBlock | null = null;
+  toolbar: HTMLDivElement | null = null;
 
   constructor(props: MarkdownEditorProps | Readonly<MarkdownEditorProps>) {
     super(props);
@@ -56,6 +70,327 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
       watch,
       fullScreen
     }
+  }
+
+  componentDidMount() {
+    if (this.toolbar) {
+      this.editorUIProps.toolBarHeight = this.toolbar.clientHeight;
+    }
+  }
+
+  get menuList(): MenuListConfig {
+    const { menuList } = this.props;
+    const cm = this.codeBlock?.cm;
+    const { watch, fullScreen } = this.editorUIProps;
+    const defaultMenuList: MenuListConfig = [
+      {
+        title: '撤销（Ctrl+Z）',
+        icon: 'undo',
+        onClick: () => {
+          cm.focus();
+          cm.undo();
+        },
+      },
+      {
+        title: '重做（Ctrl+Y）',
+        icon: 'redo',
+        onClick: () => {
+          cm.focus();
+          cm.redo();
+        },
+      },
+      '|',
+      {
+        title: '粗体',
+        icon: 'bold',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          cm.replaceSelection(`**${selection}**`);
+          if (selection === '') {
+            cm.setCursor(cursor.line, cursor.ch + 2);
+          }
+        },
+      },
+      {
+        title: '删除线',
+        icon: 'strikethrough',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          cm.replaceSelection(`~~${selection}~~`);
+
+          if (selection === '') {
+            cm.setCursor(cursor.line, cursor.ch + 2);
+          }
+        },
+      },
+      {
+        title: '斜体',
+        icon: 'italic',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          cm.replaceSelection(`*${selection}*`);
+          if (selection === '') {
+            cm.setCursor(cursor.line, cursor.ch + 1);
+          }
+        },
+      },
+      {
+        title: '引用',
+        icon: 'quote-left',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          if (cursor.ch !== 0) {
+            cm.setCursor(cursor.line, 0);
+            cm.replaceSelection(`> ${selection}`);
+            cm.setCursor(cursor.line, cursor.ch + 2);
+          } else {
+            cm.replaceSelection(`> ${selection}`);
+          }
+        },
+      },
+      {
+        title: '将每个单词首字母转成大写',
+        text: 'Aa',
+        onClick: () => {
+          cm.focus();
+          const selection = cm.getSelection();
+          const selections = cm.listSelections();
+          cm.replaceSelection(
+            selection.toLowerCase().replace(/\b(\w)|\s(\w)/g, (char) => {
+              return char.toUpperCase();
+            })
+          );
+          cm.setSelections(selections);
+        },
+      },
+      {
+        title: '将所选转换成大写',
+        text: 'A',
+        onClick: () => {
+          cm.focus();
+          const selection = cm.getSelection();
+          const selections = cm.listSelections();
+          cm.replaceSelection(selection.toUpperCase());
+          cm.setSelections(selections);
+        },
+      },
+      {
+        title: '将所选转换成小写',
+        text: 'a',
+        onClick: () => {
+          cm.focus();
+          const selection = cm.getSelection();
+          const selections = cm.listSelections();
+          cm.replaceSelection(selection.toLowerCase());
+          cm.setSelections(selections);
+        },
+      },
+      '|',
+      {
+        title: '标题1',
+        text: 'h1',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          if (cursor.ch !== 0) {
+            cm.setCursor(cursor.line, 0);
+            cm.replaceSelection(`# ${selection}`);
+            cm.setCursor(cursor.line, cursor.ch + 2);
+          } else {
+            cm.replaceSelection(`# ${selection}`);
+          }
+        },
+      },
+      {
+        title: '标题2',
+        text: 'h2',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          if (cursor.ch !== 0) {
+            cm.setCursor(cursor.line, 0);
+            cm.replaceSelection(`## ${selection}`);
+            cm.setCursor(cursor.line, cursor.ch + 3);
+          } else {
+            cm.replaceSelection(`## ${selection}`);
+          }
+        },
+      },
+      {
+        title: '标题3',
+        text: 'h3',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          if (cursor.ch !== 0) {
+            cm.setCursor(cursor.line, 0);
+            cm.replaceSelection(`### ${selection}`);
+            cm.setCursor(cursor.line, cursor.ch + 4);
+          } else {
+            cm.replaceSelection(`### ${selection}`);
+          }
+        },
+      },
+      {
+        title: '标题4',
+        text: 'h4',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          if (cursor.ch !== 0) {
+            cm.setCursor(cursor.line, 0);
+            cm.replaceSelection(`#### ${selection}`);
+            cm.setCursor(cursor.line, cursor.ch + 5);
+          } else {
+            cm.replaceSelection(`#### ${selection}`);
+          }
+        },
+      },
+      {
+        title: '标题5',
+        text: 'h5',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          if (cursor.ch !== 0) {
+            cm.setCursor(cursor.line, 0);
+            cm.replaceSelection(`##### ${selection}`);
+            cm.setCursor(cursor.line, cursor.ch + 6);
+          } else {
+            cm.replaceSelection(`##### ${selection}`);
+          }
+        },
+      },
+      {
+        title: '标题6',
+        text: 'h6',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          const selection = cm.getSelection();
+          if (cursor.ch !== 0) {
+            cm.setCursor(cursor.line, 0);
+            cm.replaceSelection(`###### ${selection}`);
+            cm.setCursor(cursor.line, cursor.ch + 7);
+          } else {
+            cm.replaceSelection(`###### ${selection}`);
+          }
+        },
+      },
+      '|',
+      {
+        title: '无序列表',
+        icon: 'unorderedlist',
+        onClick: () => {
+          cm.focus();
+          const selection = cm.getSelection();
+          if (selection === '') {
+            cm.replaceSelection(`- ${selection}`);
+          } else {
+            let selectionText = selection.split('\n');
+            selectionText = selectionText.map((item) =>
+              item === '' ? '' : `- ${item}`
+            );
+            cm.replaceSelection(selectionText.join('\n'));
+          }
+        },
+      },
+      {
+        title: '有序列表',
+        icon: 'orderedlist',
+        onClick: () => {
+          cm.focus();
+          const selection = cm.getSelection();
+          if (selection === '') {
+            cm.replaceSelection(`1. ${selection}`);
+          } else {
+            let selectionText = selection.split('\n');
+            selectionText = selectionText.map((item, index) =>
+              item === '' ? '' : `${index + 1}. ${item}`
+            );
+            cm.replaceSelection(selectionText.join('\n'));
+          }
+        },
+      },
+      {
+        title: '横线',
+        icon: 'minus',
+        onClick: () => {
+          cm.focus();
+          const cursor = cm.getCursor();
+          cm.replaceSelection(
+            `${cursor.ch !== 0 ? '\n\n' : '\n'}------------\n\n`
+          );
+        },
+      },
+      '|',
+      {
+        title: '日期时间',
+        icon: 'time-circle',
+        onClick: () => {
+          const { dateFormat } = this.props;
+          cm.focus();
+          moment.locale(navigator.language);
+          cm.replaceSelection(moment().format(dateFormat));
+        }
+      },
+      '|',
+      {
+        title: fullScreen ? '退出全屏' : '全屏（按ESC还原）',
+        icon: `fullscreen${fullScreen ? '-exit' : ''}`,
+        onClick: () => {
+          this.editorUIProps.fullScreen = !fullScreen;
+        },
+      },
+      {
+        title: `${watch ? '关闭' : '开启'}实时预览`,
+        icon: `eye${watch ? '-close' : ''}`,
+        onClick: () => {
+          this.editorUIProps.watch = !watch;
+        },
+      },
+    ];
+    if (menuList) return [...defaultMenuList, ...menuList(cm)];
+    return defaultMenuList;
+  }
+
+  /**
+   * 初始化工具栏
+   */
+  initToolbar = () => {
+    return (
+      <ul className="zhique-editor-menu">
+        {this.menuList.map((item, index) => {
+          if (item == '|') {
+            return (
+              <li className={classNames('"menu-item', 'divider')} key={`menu-item-${index}`} />
+            );
+          }
+          const { title, icon, onClick, text } = item;
+          return (
+            <li key={`menu-item-${index}`} onClick={onClick} title={title}>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a className="menu-item">
+                {icon ? <Icon type={icon} /> : text}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    )
   }
 
   /**
@@ -127,17 +462,20 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
 
   render() {
     const {
-      className,
       cmOptions,
-      ...rest
     } = this.props;
-    const { watch, fullScreen, width, height } = this.editorUIProps;
+    const { watch, fullScreen, width, height, toolBarHeight } = this.editorUIProps;
     const cls = classNames('zhique-editor', {
       'zhique-editor-fullscreen': fullScreen
     })
     const styles = {
       width: fullScreen ? window.innerWidth : width,
-      height: fullScreen ? window.innerHeight : height
+      height: fullScreen
+        ? toolBarHeight
+          ? window.innerHeight - toolBarHeight
+          : window.innerHeight
+        : height,
+      paddingTop: toolBarHeight,
     }
     return (
       <div className={cls} style={styles}>
@@ -169,6 +507,16 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
             </div>
           </div>
         )}
+        <div
+          className="zhique-editor-toolbar"
+          ref={(node) => {
+            this.toolbar = node;
+          }}
+        >
+          <div className="zhique-editor-toolbar-container">
+            {this.initToolbar()}
+          </div>
+        </div>
       </div>
     );
   }

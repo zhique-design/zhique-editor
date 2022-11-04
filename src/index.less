@@ -33,6 +33,58 @@
       padding: 15px;
     }
   }
+
+  &-toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    border-bottom: @border-style;
+
+    &-container {
+      padding: 0 8px;
+    }
+  }
+
+  &-menu {
+    list-style: none;
+
+    & > li {
+      margin: 0;
+      padding: 5px 1px;
+      display: inline-block;
+      position: relative;
+
+      & > a {
+        outline: 0;
+        transition: all 300ms ease-out;
+        color: #666;
+        display: inline-block;
+        min-width: 24px;
+        font-size: 16px;
+        text-decoration: none;
+        text-align: center;
+        border-radius: 2px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        padding: 5px;
+
+        &:hover {
+          border: 1px solid #ddd;
+          background: #eee;
+          color: #1c71fe;
+          text-decoration: none;
+        }
+      }
+
+      &.divider {
+        text-indent: -99999px;
+        margin: 0 5px;
+        height: 65%;
+        border-right: 1px solid #ddd;
+      }
+    }
+  }
 }
 
 .zhique-icon {
