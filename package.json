@@ -22,7 +22,7 @@
     "start:demo": "webpack-dev-server --config webpack.config.dev.js",
     "build:demo": "cross-env NODE_ENV=production webpack --mode production --config webpack.config.dev.js",
     "clean:dist": "rimraf ./dist",
-    "copy:files": "copyfiles -u 1 src/**/*.less dist/",
+    "copy:files": "copyfiles -u 1 src/**/*.less src/**/*.js dist/",
     "build:ts": "yarn run clean:dist && tsc -p tsconfig.production.json && yarn run copy:files",
     "deploy": "yarn run build:demo && gh-pages -d demo/dist"
   },

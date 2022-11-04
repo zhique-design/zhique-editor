@@ -7,7 +7,10 @@ import { observable } from 'mobx';
 import CodeBlock from './CodeBlock';
 import Markdown from './Markdown';
 
+import './assets/iconfont';
+
 import './index.less';
+import Icon from './Icon';
 
 interface MarkdownEditorProps {
   value?: string;
