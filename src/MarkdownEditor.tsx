@@ -50,6 +50,7 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
     width: '90%',
     height: 500,
     watch: true,
+    dateFormat: 'YYYY年MM月DD日 dddd'
   }
 
   @observable text?: string;
