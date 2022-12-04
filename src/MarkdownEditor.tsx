@@ -409,7 +409,9 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
    * @param value 编辑器值
    */
   handleCodeBlockValueChange = value => {
-    this.text = value;
+    runInAction(() => {
+      this.text = value;
+    });
     const { onChange } = this.props;
     if (onChange) onChange(value);
   }
