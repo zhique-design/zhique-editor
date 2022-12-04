@@ -3,6 +3,7 @@
   overflow: hidden;
   position: relative;
   border: 1px solid #ddd;
+  background-color: #fff;
   margin: 0 auto;
 }
 .zhique-editor ::-webkit-scrollbar {
