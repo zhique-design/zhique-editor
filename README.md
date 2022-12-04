@@ -17,13 +17,13 @@ zhique-editor
 - npm
 
 ```
-npm install zhique-editor
+npm install zhique-editor codemirror@^5.65.9 github-markdown-css
 ```
 
 - yarn
 
 ```
-yarn add zhique-editor
+yarn add zhique-editor codemirror@^5.65.9 github-markdown-css
 ```
 
 ------------

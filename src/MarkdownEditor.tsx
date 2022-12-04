@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import CodeMirror, {  EditorConfiguration } from 'codemirror';
 import { observer } from 'mobx-react';
-import { makeObservable, observable } from 'mobx';
+import { makeObservable, observable, runInAction } from 'mobx';
 import moment from 'moment';
 import CodeBlock from './CodeBlock';
 import Markdown from './Markdown';
@@ -79,7 +79,9 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
 
   componentDidMount() {
     if (this.toolbar) {
-      this.editorUIProps.toolBarHeight = this.toolbar.clientHeight;
+      runInAction(() => {
+        this.editorUIProps.toolBarHeight = this.toolbar?.clientHeight;
+      })
     }
   }
 
@@ -357,14 +359,18 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
         title: fullScreen ? '退出全屏' : '全屏（按ESC还原）',
         icon: `fullscreen${fullScreen ? '-exit' : ''}`,
         onClick: () => {
-          this.editorUIProps.fullScreen = !fullScreen;
+          runInAction(() => {
+            this.editorUIProps.fullScreen = !fullScreen;
+          });
         },
       },
       {
         title: `${watch ? '关闭' : '开启'}实时预览`,
         icon: `eye${watch ? '-close' : ''}`,
         onClick: () => {
-          this.editorUIProps.watch = !watch;
+          runInAction(() => {
+            this.editorUIProps.watch = !watch;
+          });
         },
       },
     ];
