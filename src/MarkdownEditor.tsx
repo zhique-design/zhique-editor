@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import CodeMirror, {  EditorConfiguration } from 'codemirror';
 import { observer } from 'mobx-react';
-import { observable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 import moment from 'moment';
 import CodeBlock from './CodeBlock';
 import Markdown from './Markdown';
@@ -44,7 +44,7 @@ type EditorUIProps = {
 }
 
 @observer
-class MarkdownEditor extends Component<MarkdownEditorProps> {
+export default class MarkdownEditor extends Component<MarkdownEditorProps> {
 
   static defaultProps = {
     width: '90%',
@@ -53,9 +53,9 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
     dateFormat: 'YYYY年MM月DD日 dddd'
   }
 
-  @observable text?: string;
+  text?: string;
 
-  @observable editorUIProps: EditorUIProps;
+  editorUIProps: EditorUIProps;
 
   previewBlock: HTMLDivElement | null = null;
   codeBlock: CodeBlock | null = null;
@@ -70,7 +70,11 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
       height,
       watch,
       fullScreen
-    }
+    };
+    makeObservable(this, {
+      text: observable,
+      editorUIProps: observable
+    })
   }
 
   componentDidMount() {
@@ -523,4 +527,3 @@ class MarkdownEditor extends Component<MarkdownEditorProps> {
   }
 }
 
-export default MarkdownEditor;
