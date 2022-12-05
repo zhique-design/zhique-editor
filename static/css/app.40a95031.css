@@ -21,6 +21,9 @@
   line-height: 1.6;
   border-right: 1px solid #ddd;
 }
+.zhique-editor .CodeMirror-scroll {
+  box-sizing: content-box;
+}
 .zhique-editor-preview {
   overflow: auto;
   line-height: 1.6;
