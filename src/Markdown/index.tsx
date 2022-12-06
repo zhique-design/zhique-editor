@@ -1,13 +1,15 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import ReactMarkdown, { ReactMarkdownPropsBase } from 'react-markdown';
 import gfm from 'remark-gfm';
 import Code from './renderer/Code';
 
 interface MarkdownProps extends ReactMarkdownPropsBase {
   readonly value?: string;
+  className?: string;
+  linkTarget?: string;
 }
 
-class Markdown extends Component<MarkdownProps> {
+class Markdown extends PureComponent<MarkdownProps> {
   static defaultProps = {
     className: 'markdown-body',
     linkTarget: '_blank',
@@ -17,11 +19,9 @@ class Markdown extends Component<MarkdownProps> {
     const { value, ...rest } = this.props;
     return (
       <ReactMarkdown
-        plugins={[
-          gfm,
-        ]}
+        plugins={[gfm]}
         renderers={{
-          code: Code
+          code: Code,
         }}
         {...rest}
       >

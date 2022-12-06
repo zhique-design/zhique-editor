@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import CodeMirror, {  EditorConfiguration } from 'codemirror';
-import { observer } from 'mobx-react';
-import { makeObservable, observable, runInAction } from 'mobx';
+import CodeMirror, { EditorConfiguration } from 'codemirror';
 import moment from 'moment';
 import CodeBlock from './CodeBlock';
 import Markdown from './Markdown';
@@ -35,7 +33,8 @@ interface MarkdownEditorProps {
   dateFormat?: string;
 }
 
-type EditorUIProps = {
+interface MarkdownEditorState {
+  text?: string;
   width?: string | number;
   height?: string | number;
   watch?: boolean;
@@ -43,52 +42,48 @@ type EditorUIProps = {
   toolBarHeight?: number;
 }
 
-@observer
-export default class MarkdownEditor extends Component<MarkdownEditorProps> {
-
+export default class MarkdownEditor extends Component<
+  MarkdownEditorProps,
+  MarkdownEditorState
+> {
   static defaultProps = {
     width: '90%',
     height: 500,
     watch: true,
-    dateFormat: 'YYYY年MM月DD日 dddd'
-  }
-
-  text?: string;
-
-  editorUIProps: EditorUIProps;
+    dateFormat: 'YYYY年MM月DD日 dddd',
+  };
 
   previewBlock: HTMLDivElement | null = null;
+
   codeBlock: CodeBlock | null = null;
+
   toolbar: HTMLDivElement | null = null;
 
   constructor(props: MarkdownEditorProps | Readonly<MarkdownEditorProps>) {
     super(props);
     const { value, watch, fullScreen, width, height } = this.props;
-    this.text = value;
-    this.editorUIProps = {
+    this.state = {
+      text: value,
       width,
       height,
       watch,
-      fullScreen
+      fullScreen,
+      toolBarHeight: 0,
     };
-    makeObservable(this, {
-      text: observable,
-      editorUIProps: observable
-    })
   }
 
   componentDidMount() {
     if (this.toolbar) {
-      runInAction(() => {
-        this.editorUIProps.toolBarHeight = this.toolbar?.clientHeight;
-      })
+      this.setState({
+        toolBarHeight: this.toolbar?.clientHeight,
+      });
     }
   }
 
   get menuList(): MenuListConfig {
     const { menuList } = this.props;
     const cm = this.codeBlock?.cm;
-    const { watch, fullScreen } = this.editorUIProps;
+    const { watch, fullScreen } = this.state;
     const defaultMenuList: MenuListConfig = [
       {
         title: '撤销（Ctrl+Z）',
@@ -352,15 +347,15 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
           cm.focus();
           moment.locale(navigator.language);
           cm.replaceSelection(moment().format(dateFormat));
-        }
+        },
       },
       '|',
       {
         title: fullScreen ? '退出全屏' : '全屏（按ESC还原）',
         icon: `fullscreen${fullScreen ? '-exit' : ''}`,
         onClick: () => {
-          runInAction(() => {
-            this.editorUIProps.fullScreen = !fullScreen;
+          this.setState({
+            fullScreen: !fullScreen,
           });
         },
       },
@@ -368,8 +363,8 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
         title: `${watch ? '关闭' : '开启'}实时预览`,
         icon: `eye${watch ? '-close' : ''}`,
         onClick: () => {
-          runInAction(() => {
-            this.editorUIProps.watch = !watch;
+          this.setState({
+            watch: !watch,
           });
         },
       },
@@ -385,36 +380,37 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
     return (
       <ul className="zhique-editor-menu">
         {this.menuList.map((item, index) => {
-          if (item == '|') {
+          if (item === '|') {
             return (
-              <li className={classNames('"menu-item', 'divider')} key={`menu-item-${index}`} />
+              <li
+                className={classNames('"menu-item', 'divider')}
+                key={`menu-item-${index}`}
+              />
             );
           }
           const { title, icon, onClick, text } = item;
           return (
             <li key={`menu-item-${index}`} onClick={onClick} title={title}>
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-              <a className="menu-item">
-                {icon ? <Icon type={icon} /> : text}
-              </a>
+              <a className="menu-item">{icon ? <Icon type={icon} /> : text}</a>
             </li>
           );
         })}
       </ul>
-    )
-  }
+    );
+  };
 
   /**
    * 处理编辑器值得变化
    * @param value 编辑器值
    */
-  handleCodeBlockValueChange = value => {
-    runInAction(() => {
-      this.text = value;
+  handleCodeBlockValueChange = (value) => {
+    this.setState({
+      text: value,
     });
     const { onChange } = this.props;
     if (onChange) onChange(value);
-  }
+  };
 
   /**
    * 当编辑器滚动时，预览部分同步滚动
@@ -424,7 +420,7 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
    * @param percent 编辑器滚动百分比
    */
   previewBlockSyncScroll = (top, scrollHeight, height, percent) => {
-    const { watch } = this.editorUIProps;
+    const { watch } = this.state;
     if (watch) {
       if (top === 0) {
         this.previewBlock?.scrollTo({ top: 0 });
@@ -432,18 +428,22 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
         this.previewBlock?.scrollTo({ top: this.previewBlock?.scrollHeight });
       } else {
         this.previewBlock?.scrollTo({
-          top: this.previewBlock?.scrollHeight * percent,
+          top: (this.previewBlock?.scrollHeight || 0) * percent,
         });
       }
     }
-  }
+  };
 
   /**
    * 编辑器同步滚动
    */
   codeBlockSyncScroll = () => {
     if (this.previewBlock) {
-      const { clientHeight: height, scrollTop, scrollHeight } = this.previewBlock;
+      const {
+        clientHeight: height,
+        scrollTop,
+        scrollHeight,
+      } = this.previewBlock;
       const percent = scrollTop / scrollHeight;
       const codeScroller = this.codeBlock?.cm?.display.scroller;
       if (codeScroller) {
@@ -472,15 +472,13 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
     this.previewBlock?.removeEventListener('scroll', this.codeBlockSyncScroll);
   };
 
-
   render() {
-    const {
-      cmOptions,
-    } = this.props;
-    const { watch, fullScreen, width, height, toolBarHeight } = this.editorUIProps;
-    const cls = classNames('zhique-editor', {
-      'zhique-editor-fullscreen': fullScreen
-    })
+    const { cmOptions, className } = this.props;
+    const { text, watch, fullScreen, width, height, toolBarHeight } =
+      this.state;
+    const cls = classNames('zhique-editor', className, {
+      'zhique-editor-fullscreen': fullScreen,
+    });
     const styles = {
       width: fullScreen ? window.innerWidth : width,
       height: fullScreen
@@ -489,11 +487,11 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
           : window.innerHeight
         : height,
       paddingTop: toolBarHeight,
-    }
+    };
     return (
       <div className={cls} style={styles}>
         <CodeBlock
-          value={this.text}
+          value={text}
           options={cmOptions}
           onChange={this.handleCodeBlockValueChange}
           onCmScroll={this.previewBlockSyncScroll}
@@ -503,7 +501,7 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
         />
         {watch && (
           <div
-            className={`zhique-editor-preview`}
+            className="zhique-editor-preview"
             style={{ width: '50%', height: '100%' }}
             ref={(node) => {
               this.previewBlock = node;
@@ -513,10 +511,8 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
             onMouseOut={this.unbindSyncScroll}
             onTouchEnd={this.unbindSyncScroll}
           >
-            <div
-              className="zhique-editor-preview-container"
-            >
-              <Markdown value={this.text} />
+            <div className="zhique-editor-preview-container">
+              <Markdown value={text} />
             </div>
           </div>
         )}
@@ -534,4 +530,3 @@ export default class MarkdownEditor extends Component<MarkdownEditorProps> {
     );
   }
 }
-
