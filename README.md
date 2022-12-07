@@ -27,7 +27,6 @@ yarn add zhique-editor codemirror@^5.65.9 github-markdown-css
 ```
 
 ------------
-
 MarkdownEditor
 --------------
 1. **Basic usage**
