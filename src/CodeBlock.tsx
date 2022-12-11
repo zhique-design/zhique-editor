@@ -57,8 +57,9 @@ export default class CodeBlock extends Component<CodeBlockProps> {
   };
 
   removeEventListeners = () => {
-    const { wrapper, scroller } = this.cm;
-    this.cm.un('change', this.handleChange);
+    const {
+      display: { wrapper, scroller },
+    } = this.cm;
     wrapper.removeEventListener('mouseover', () => this.cmBindScroll(scroller));
     wrapper.removeEventListener('touchstart', () =>
       this.cmBindScroll(scroller)
